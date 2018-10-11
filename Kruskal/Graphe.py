@@ -5,6 +5,9 @@ import networkx as nx
 import matplotlib.pyplot as plt
 
 
+# Implémentation personnelle (et surement très mauvaise) de l'algorithme de kruskal
+# qui recherche un Arbre couvrant minimum dans un arbre connexe non orienté et pondéré.
+
 def kruskal(sommet, app_val):
     
     print("Algorithme de Kruskal déployé...")
