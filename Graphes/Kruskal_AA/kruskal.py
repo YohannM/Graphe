@@ -145,3 +145,28 @@ if __name__ == "__main__":
 
     print("Fin")
 
+def kruskal_matrice(matrice):
+    
+    sommets = [x for x in range(len(matrice))]
+    sommets_valide = []
+    liste = []
+    for i, som in enumerate(matrice):
+        for j, val in enumerate(som):
+            if val:
+                liste.append([[i, j], val])
+    
+    return kruskal(sommets, liste)
+
+def triListe (liste):
+    liste_1 = []
+    while len(liste) != 0:
+        indice_min = 0
+        for x in range(len(liste)):
+            if liste[x][1] < liste[indice_min][1]:
+                indice_min = x
+        liste_1.append(liste[indice_min])
+        liste.pop(indice_min)
+    return liste_1
+            
+        
+

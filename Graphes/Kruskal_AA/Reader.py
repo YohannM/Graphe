@@ -1,4 +1,6 @@
-import kruskal as Graphe 
+
+
+import kruskal as kk
 
 def readGraph():
 
@@ -16,30 +18,28 @@ def readGraph():
         return Matrix
 
 Matrix = readGraph()
-app_val = []
+liste = []
 
 for i, som in enumerate(Matrix):
     for j, val in enumerate(som):
-        if val != 0:
-            app_val.append([[i, j], val])
+        liste.append([[i, j], val])
+
+sommets = [x for x in range(len(Matrix))]
+
+#print(sommets)
+#print(Matrix)
+#print(liste)
+
+app_ = []
+som_ = []
+
+for app in liste:
+    app_.append(app[0])
+    som_.append(app[1])
 
 
+bon_matrice, val = kk.kruskal_matrice(Matrix)
 
-sommet = [0,1,2,3,4,5]
-
-# app_val = [[[1, 2], 1], [[2, 3], 2], [[1, 4], 3], [[3, 4], 1], [[2, 4], 4]]
-
-app = []
-val_dep = []
-
-for i in range(len(app_val)):
-    app.append(app_val[i][0])
-    val_dep.append(app_val[i][1])
-
-Graphe.affiche_graphe(app, val_dep, "Graphe d'origine")
-
-app_couvrante, val = Graphe.kruskal(sommet, app_val)
-
-Graphe.affiche_graphe(app_couvrante, val, "Graphe avec arbre couvrant minimal")
-
-print("Fin")
+kk.affiche_graphe(app_, som_, "origine")
+kk.affiche_graphe(bon_matrice, val, "Ma Matrice")
+            
