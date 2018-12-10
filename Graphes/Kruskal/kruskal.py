@@ -1,147 +1,99 @@
 
-import pandas as pd
-import numpy as np
-import networkx as nx
-import matplotlib.pyplot as plt
+# applique kruskal sur une liste de la forme : [[(1,2), 5], [(5,3), 15]]
+def kruskal(app_val):
 
+    # on trie cette liste sur la base des valuations         
+    app_val = sorted(app_val, key=key_takeSecond)
 
-# Implémentation personnelle (et surement très mauvaise) de l'algorithme de kruskal
-# qui recherche un Arbre couvrant minimum dans un arbre connexe non orienté et pondéré.
-# [[(1,2), 5], [(5,3), 15]]
+    sommets_connectes = []
+    app_val_acm = []
 
-def kruskal(sommet, app_val):
-    
-    print("Algorithme de Kruskal déployé...")
+    # on applique Kruskal
+    for app in app_val:
+        if app[0][0] not in sommets_connectes or app[0][1] not in sommets_connectes:
+            if app[0][0] not in sommets_connectes:
+                sommets_connectes.append(app[0][0])
+            if app[0][1] not in sommets_connectes:
+                sommets_connectes.append(app[0][1])
+            app_val_acm.append(app)
 
-    app_arbre_courant = []
-    rep_s = []
-
-    val_return = []
-
-    for s in sommet:
-        rep_s.append(s)
-
-    while len(app_arbre_courant) != len (sommet) - 1:
-        app_val_loc = []
-        val = []
-
-        for i in range(len(app_val)):
-            val.append(app_val[i][1]) # On ajoute les valuations
-        val.sort()
-
-        tmp = app_val
-
-        for i in range(len(val)):
-            for j in range(len(tmp)):
-                if tmp[j][1] == val[i]:
-                    app_val_loc.append(tmp[j]) # On trie les app_val en fct des valuations
-                    tmp[j][1] == -1
-                    break
-
-        arrete = app_val_loc[0][0]
-
-        if rep_s[arrete[0]-1] != rep_s[arrete[1]-1]:
-            app_arbre_courant.append(arrete)
-            val_return.append(app_val_loc[0][1])
-
-            for rep in rep_s:
-                if rep == rep_s[arrete[0]-1]:
-                    rep = rep_s[arrete[1]-1]
-
-        app_val_loc[0][1] = 500
-
-    print("Kruskal terminé !")
-
-    return app_arbre_courant, val_return
-
-def affiche_graphe(app_val, val, nom):
-
-    print(nom + " est en construction...")
-
-    app_val_loc = app_val
-    source = []
-    but = []
-
-    for i in range(len(app_val_loc)):
-        source.append(str(app_val_loc[i][0]))
-        but.append(str(app_val_loc[i][1]))
-    
-    G = nx.Graph()
-
-    for i in range(len(source)):
-        G.add_edge(str(source[i]), str(but[i]), weight=val[i])
-
-    nx.draw_networkx_edge_labels(G,pos=nx.circular_layout(G), font_color = 'b')
-
-    nx.draw_circular(G, with_labels=True, node_size=400, 
-    node_color="skyblue", node_shape="s", alpha=0.5, linewidths=10)
-    plt.show()
+    return app_val_acm
 
 
 
-if __name__ == "__main__":
-    try:
-        nb_sommet = int(input("Rentrez le nombre de sommet du grapghe : \n"))
-        assert nb_sommet > 0
-    except ValueError:
-        print("Saisie non valide\n")
-        exit()
-    except AssertionError:
-        print("Nombre négatif ou nul\n")
-        exit()
 
-    sommet = []
-
-    for i in range(nb_sommet):
-        sommet.append(i+1)
-
-    try:
-        nb_app = int(input("Rentrez le nombre d'arrêtes\n"))
-        assert nb_app > 0
-    except ValueError:
-        print("Erreur de saisie\n")
-        exit()
-    except AssertionError:
-        print("Nombre négatif ou nul\n")
-        exit()
+def kruskal_liste_adj(liste_adj):
 
     app_val = []
 
-    for i in range(nb_app):
-        nb_incorrect = True
+    # on transforme la liste d'adjacence en liste de la forme : [[(1,2), 5], [(5,3), 15]]
+    for s in liste_adj:
+        noeud_connecte = s.suiv
+        while noeud_connecte != None:
+             app_val.append([(s.sommet, noeud_connecte.sommet), noeud_connecte.valuation])
+             noeud_connecte = noeud_connecte.suiv
 
-        while nb_incorrect:
-            try:
-                s1 = int(input("Application {} : rentrez le sommet source (numéro attendu)\n".format(i+1)))
-                s2 = int(input("Application {} : rentrez le sommet but (numéro attendu)\n".format(i+1)))
-                assert s1 in sommet and s2 in sommet
-                nb_incorrect = False
-            except ValueError:
-                print("Saisie incorrecte\n")
-            except AssertionError:
-                print("Sommet inconnu\n")
-            
-        nb_incorrect = True
+    # on appelle kruskal sur cette liste
+    app_val_acm = kruskal(app_val)
 
-        while nb_incorrect:
-            try:
-                val = int(input("Rentrez la valuation de l'application {}\n".format(i+1)))  
-                nb_incorrect = False
-            except ValueError:
-                print("Saisie incorrecte\n")
+    # on trie la liste obtenue sur la base des sommmets de départ
+    app_val_acm = sorted(app_val_acm, key=key_takeFirstInTuple)
 
-        app_val.append([[s1,s2], val])
+    # on crée une matrice de taille identique à la matrice de départ
+    list_adj_finale = [x for x in range(len(liste_adj))]
 
-    app = []
-    val_dep = []
+    # on crée tous les noeuds de départ
+    for i in range(len(list_adj_finale)):
+        list_adj_finale[i] = NoeudSommet(i, None, None)
 
-    for i in range(len(app_val)):
-        app.append(app_val[i][0])
-        val_dep.append(app_val[i][1])
+    # on retransforme la liste des applications en liste d'adjacence
+    # avec app_val_acm de la forme [[(1,2), 5], [(5,3), 15]]
+    for s in app_val_acm:
+        sommet_courant = list_adj_finale[s[0][0]]
+        while sommet_courant.suiv != None:
+            sommet_courant = sommet_courant.suiv
+        sommet_courant.suiv = NoeudSommet(s[0][1], s[1], None)
 
-    affiche_graphe(app, val_dep, "Graphe d'origine")
-    app_couvrante, val = kruskal(sommet, app_val)
-    affiche_graphe(app_couvrante, val, "Graphe avec arbre couvrant minimal")
+    return list_adj_finale
 
-    print("Fin")
+
+
+
+
+def kruskal_matrice(matrice):
+
+    app_val = []
+
+    # on transforme la matrice en liste de la forme : [[(1,2), 5], [(5,3), 15]]
+    for i, s in enumerate(matrice):
+        for j, val in enumerate(s):
+            app_val.append([(i, j), val])
+
+    # on appelle kruskal sur cette liste
+    app_val_acm = kruskal(app_val)
+
+    # on trie la liste obtenue sur la base des sommmets de départ
+    app_val_acm = sorted(app_val_acm, key=key_takeFirstInTuple)
+
+    # on crée la matrice finale de la même taille que la première
+    matrice_final = [[None for x in range(len(matrice[]))] for y in range(len(matrice))]
+
+    # on la remplit
+    for app in app_val_acm:
+        matrice_final[app[0][0]][app[0][1]] = app[1]
+
+    return matrice_final
+
+
+
+
+
+
+def key_takeSecond(liste):
+    return liste[1]
+
+def key_takeFirstInTuple(liste):
+    return liste[0][0]
+
+
 
